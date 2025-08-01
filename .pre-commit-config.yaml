@@ -1,0 +1,18 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Ruff version.
+    rev: v0.6.3
+    hooks:
+      # Run the linter.
+      - id: ruff
+        name: Ruff Lint
+      - id: ruff
+        name: Ruff Import Lint
+        args: [--select, I]
+      # Run the formatter.
+      - id: ruff-format
+        name: Ruff Format
+  - repo: https://github.com/dosisod/refurb
+    rev: v2.0.0
+    hooks:
+      - id: refurb

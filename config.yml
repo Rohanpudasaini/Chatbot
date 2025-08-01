@@ -1,0 +1,18 @@
+# config.yml
+language: en
+
+pipeline:
+# 1. Component for tokenizing message
+- name: WhitespaceTokenizer
+
+# 2. Components for featurizing user messages
+- name: RegexFeaturizer
+- name: LexicalSyntacticFeaturizer
+- name: CountVectorsFeaturizer
+
+# 3. Component for NLU classification
+- name: DIETClassifier
+  epochs: 100
+
+# You can omit the 'policies' key entirely for NLU-only models.
+assistant_id: 20250801-101311-cyan-buffer

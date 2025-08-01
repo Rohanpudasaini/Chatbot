@@ -1,0 +1,11 @@
+.env
+.DS_Store
+.idea/
+.venv/
+__pycache__/
+mics/
+sender_analysis_report.html
+combined_output.csv
+.vscode/
+report/
+.rasa/
