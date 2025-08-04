@@ -96,9 +96,13 @@ class NLUProcessor:
             if confidence and confidence > confidence_threshold:
                 if intent_name == "send_money":
                     print("\nAction: 🚀 Initiating 'send money' flow...")
+                    print(f"🔍 Classification result: {classification_result}")
                     return {
                         "action": "send_money",
                         "message": "Initiating 'send money' flow...",
+                        "entities": [
+                            x for x in classification_result.get("entities", [])
+                        ],
                     }
                 elif intent_name == "top_up":
                     print("\nAction: 📱 Initiating 'mobile top-up' flow...")
@@ -134,7 +138,7 @@ class NLUProcessor:
 
 
 async def get_processor() -> NLUProcessor | None:
-    NLU_MODEL_PATH = "./models/nlu-20250801-101311-wintry-cod.tar.gz"
+    NLU_MODEL_PATH = "./models/nlu-20250804-135939-wise-deck.tar.gz"
     processor = NLUProcessor.create(NLU_MODEL_PATH)
     print("✅ Rasa NLUProcessor initialized successfully.")
     return processor

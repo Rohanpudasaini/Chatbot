@@ -1,5 +1,9 @@
 version: "3.1"
 
+entities:
+  - receiver_name
+  - amount
+
 nlu:
 - intent: greet
   examples: |
@@ -92,17 +96,33 @@ nlu:
 
 - intent: send_money
   examples: |
-    - send 500 to ram
-    - I want to transfer money to sita
-    - can you send some cash to gopal
+    - send [500](amount) to [ram](receiver_name)
+    - I want to transfer money to [sita] (receiver_name)
+    - can you send [1000](amount) to [gopal](receiver_name)
+    - transfer [2000](amount) to [Ramesh](receiver_name)
+    - can you send some cash to [gopal](receiver_name)
     - transfer 2000 rupees
+    - send [1000](amount) to [Ramesh](receiver_name)
+    - please transfer [2500](amount) to [Sita](receiver_name)
+    - pay [5000](amount) to [Hari](receiver_name)
+    - send [300](amount) to [Gita](receiver_name)
+    - transfer [1500](amount) to [Bikash](receiver_name)
+    - I want to send [200](amount) to [Anil](receiver_name)
 
 - intent: top_up
   examples: |
     - top up my phone
-    - recharge my mobile with 100
+    - recharge my mobile with [100](amount)
+    - I want to top up my number with [200](amount)
+    - please recharge my phone with [300](amount)
     - I need a mobile topup
     - put 50 on my number
+    - top up [200](amount) to my phone
+    - recharge my phone with [300](amount)
+    - add [100](amount) to my mobile
+    - please top up [500](amount) for my number
+    - recharge my mobile with [150](amount)
+    - top up my number by [250](amount)
 
 - intent: card_to_card_transfer
   examples: |
