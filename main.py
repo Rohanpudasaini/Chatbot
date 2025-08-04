@@ -96,42 +96,66 @@ class NLUProcessor:
             if confidence and confidence > confidence_threshold:
                 if intent_name == "send_money":
                     print("\nAction: 🚀 Initiating 'send money' flow...")
+                    return {
+                        "action": "send_money",
+                        "message": "Initiating 'send money' flow...",
+                    }
                 elif intent_name == "top_up":
                     print("\nAction: 📱 Initiating 'mobile top-up' flow...")
+                    return {
+                        "action": "top_up",
+                        "message": "Initiating 'mobile top-up' flow...",
+                    }
                 elif intent_name == "card_to_card_transfer":
                     print("\nAction: 💳 Initiating 'card to card transfer' flow...")
+                    return {
+                        "action": "card_to_card_transfer",
+                        "message": "Initiating 'card to card transfer' flow...",
+                    }
                 else:
                     print(
                         f"\nAction: 🤔 Intent recognized, but no specific action is defined. {intent_name}"
                     )
+                    return {
+                        "action": "unknown",
+                        "message": "Intent recognized, but no specific action is defined.",
+                    }
             else:
                 print(
                     f"\nAction: 🤷 Could not determine action. Confidence ({confidence:.2f}) is below threshold ({confidence_threshold})."
                 )
+                return {
+                    "action": "unknown",
+                    "message": "Could not determine action. Confidence is below threshold.",
+                }
 
 
 # --- MAIN EXECUTION LOGIC ---
 
 
-async def main():
+async def get_processor() -> NLUProcessor | None:
+    NLU_MODEL_PATH = "./models/nlu-20250801-101311-wintry-cod.tar.gz"
+    processor = NLUProcessor.create(NLU_MODEL_PATH)
+    print("✅ Rasa NLUProcessor initialized successfully.")
+    return processor
+
+
+async def process_command(
+    command: str, processor: NLUProcessor | None
+) -> dict[str, str] | None:
     """
     Main function to set up and run the NLU processor.
     """
-    # Path to your trained NLU model
-    # The filename will be something like 'nlu-YYYYMMDD-HHMMSS.tar.gz'
-    # Since the current date is August 1, 2025, let's use a plausible filename.
-    NLU_MODEL_PATH = "./models/nlu-20250801-101311-wintry-cod.tar.gz"  # <-- IMPORTANT: Change this path
-
-    # 1. Create an instance of the NLUProcessor
-    processor = NLUProcessor.create(NLU_MODEL_PATH)
 
     if processor:
-        # 2. Get text from user's voice command via Whisper
-        user_command = get_text_from_voice()
+        return await processor.process_command(command)
 
-        # 3. Pass the text to the processor to handle it
-        if user_command:
-            await processor.process_command(user_command)
+
+async def main():
+    processor = await get_processor()
+    command = get_text_from_voice()
+    result = await process_command(command=command, processor=processor)
+    print(f"🔍 Result: {result}")
 
 
 if __name__ == "__main__":
