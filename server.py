@@ -1,4 +1,5 @@
 from contextlib import asynccontextmanager
+from typing import Any, AsyncGenerator
 
 from fastapi import FastAPI
 from pydantic import BaseModel
@@ -9,11 +10,11 @@ processor: NLUProcessor | None = None
 
 
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     global processor
     processor = await get_processor()
     yield
-    processor = None  # type: ignore
+    processor = None
 
 
 class Command(BaseModel):
