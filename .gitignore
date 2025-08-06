@@ -9,3 +9,4 @@ combined_output.csv
 .vscode/
 report/
 .rasa/
+*.pt
