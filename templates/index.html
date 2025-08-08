@@ -292,7 +292,7 @@
             }
             
             initWebSocket() {
-                const wsUrl = `ws://localhost:8000/ws/voice-nlu`;
+                const wsUrl = `ws://10.10.24.157:8000/ws/voice-nlu`;
                 console.log('Connecting to:', wsUrl);
                 
                 this.ws = new WebSocket(wsUrl);
@@ -605,7 +605,7 @@
                 if (amount) params.set('amount', amount);
                 if (receiverName) params.set('receiver', receiverName);
                 
-                const sendMoneyUrl = `http://localhost:8000/sendmoney?${params.toString()}`;
+                const sendMoneyUrl = `http://10.10.24.157:8000/sendmoney?${params.toString()}`;
                 
                 // Show notification
                 this.updateStatus('💰 Opening send money form...', 'success');
