@@ -7,12 +7,13 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any, AsyncGenerator
 
-import whisper
+import torch
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from googletrans import Translator
 from pydantic import BaseModel
+from transformers import Pipeline, pipeline
 from websockets.exceptions import ConnectionClosedError
 
 from main import NLUProcessor, get_processor, process_command
@@ -23,13 +24,13 @@ translator = Translator()
 
 # Global variables for models
 processor: NLUProcessor | None = None
-whisper_model: whisper.Whisper | None = None
+asr_pipeline: Pipeline | None = None
 templates = Jinja2Templates(directory="templates")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
-    global processor, whisper_model
+    global processor, asr_pipeline
 
     print("🚀 Starting application...")
 
@@ -41,7 +42,13 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
     # Load Whisper model
     print("🎤 Loading Whisper model...")
     # Download and cache the model locally
-    whisper_model = whisper.load_model("base", download_root="./models")
+    # whisper_model = whisper.load_model("base", download_root="./models")
+    asr_pipeline = pipeline(
+        "automatic-speech-recognition",
+        model="openai/whisper-large-v3",
+        torch_dtype=torch.float16,
+        device=0,  # Ensure GPU is used
+    )
     print("✅ Whisper model loaded!")
 
     print("🎉 All models loaded successfully!")
@@ -49,7 +56,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, Any]:
 
     # Cleanup
     processor = None
-    whisper_model = None
+    asr_pipeline = None
     print("🧹 Models cleaned up")
 
 
@@ -89,7 +96,7 @@ class AudioRecorder:
 
             # Transcribe using Whisper
             print("🎤 Transcribing audio...")
-            result = whisper_model.transcribe(temp_audio_path)  # type: ignore
+            result = asr_pipeline(temp_audio_path)  # type: ignore
             transcription = result["text"].strip()  # type: ignore
             language = result.get("language", "unknown")
             # if language != "en":
@@ -148,7 +155,7 @@ async def voice_nlu_websocket(websocket: WebSocket):
                     "type": "connected",
                     "message": "Voice + NLU processor ready",
                     "models_loaded": {
-                        "whisper": whisper_model is not None,
+                        "whisper": asr_pipeline is not None,
                         "rasa_nlu": processor is not None,
                     },
                 }
@@ -259,7 +266,7 @@ async def voice_nlu_websocket(websocket: WebSocket):
                                 "message": "WebSocket connection active",
                                 "models_status": {
                                     "whisper": "loaded"
-                                    if whisper_model
+                                    if asr_pipeline
                                     else "not loaded",
                                     "rasa_nlu": "loaded" if processor else "not loaded",
                                 },
